@@ -3,6 +3,9 @@ import numpy as np
 import time
 import datetime
 import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
+import pydeck as pdk
 
 # Titre
 st.title("Mon application Streamlit avec Markdown")
@@ -82,30 +85,50 @@ st.file_uploader("Choisissez les fichier à télécharger", accept_multiple_file
 st.checkbox("J'ai testé les checkbox")
 st.checkbox("J'ai testé les checkbox", value=True)
 
-df_citizen = pd.read_csv("demo/Citizen_DATA.csv")
-df_citizen
 
+df_citizen = pd.read_csv("demo/Citizen_DATA.csv")
+# ces deux instructions affichent la même chose
+df_citizen
+st.write(df_citizen)
 
 # widget pour tracer un graphique en ligne avec des données numériques
-st.line_chart()
+# st.line_chart(df_citizen, x='age', y='gender')
+# st.line_chart(df_citizen, x='age', y='name')
+# st.line_chart(df_citizen, x='age', y='city')
+st.line_chart(df_citizen[:20], y='age')
 
 # widget pour tracer un graphique de zone (aire) avec des données numériques
-st.area_chart()
+# st.area_chart(df_citizen, x='age', y='gender')
+# st.area_chart(df_citizen, x='age', y='name')
+# st.area_chart(df_citizen, x='age', y='city')
+st.area_chart(df_citizen[:20], y='age')
 
 # widget pour tracer un graphique à barres avec des données numériques
-st.bar_chart()
+st.bar_chart(df_citizen[:20], y='age')
 
 # widget pour tracer n'importe quel graphique matplotlib (créé avec la librairie pyplot) dans Streamlit
-#st.pyplot()
+figure, axes = plt.subplots()
+axes.plot(df_citizen['id'][:20], df_citizen['gender'][:20])
+st.pyplot(figure)
 
 # widget pour tracer un graphique interactif à l'aide de Plotly
-#st.plotly_chart()
+fig = px.scatter(x=df_citizen['id'][:20], y=df_citizen['age'][:20])
+st.plotly_chart(fig)
 
 # widget pour tracer un graphique avec des spécifications Vega-Lite
-#st.vega_lite_chart()
+st.vega_lite_chart(df_citizen, spec={
+    'mark': {'type': 'circle', 'tooltip': True},
+    'encoding': {
+        'x': {'field': 'id', 'type': 'quantitative'},
+        'y': {'field': 'age', 'type': 'quantitative'},
+        'size': {'field': 'id', 'type': 'quantitative'},
+        'color': {'field': 'age', 'type': 'quantitative'},
+    },
+})
 
 # permet de tracer des cartes interactives 3D à l'aide de la bibliothèque Pydeck (objet(s) Layer Pydeck en entrée)
-#st.pydeck_chart()
+# layer = pdk.Layer('ScatterplotLayer', df_citizen, get_position=['id', 'age'])
+# st.pydeck_chart(layer)
 
 progress_bar = st.sidebar.progress(0)
 status_text = st.sidebar.empty()
